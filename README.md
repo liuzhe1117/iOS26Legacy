@@ -1,64 +1,62 @@
 # iOS26Legacy
 
-[English](./README.md) | [中文](./README.zh.md)
+[English](./README.en.md) | [中文](./README.md)
 
-iOS26Legacy is a UIKit compatibility pod for iOS 26 behavior changes.  
-Its goal is to make UIKit components on iOS 26 behave closer to older system versions.
+iOS26Legacy 是一个用于适配 iOS 26 行为变化的 UIKit 兼容性 Pod。目标是令 iOS 26 上的系统UI组件可以表现得与低版本一致。
+- 通过OC方法交换技术，实现无侵入式适配，只需源码引入本pod即可
+- 依赖RSSwizzle
+- 仅供交流学习使用
 
-- Uses Objective-C method swizzling for non-invasive adaptation.
-- Depends on RSSwizzle.
-- For communication and learning only.
+## 功能说明
 
-## What It Does
-
-All hooks are enabled only when `+[iOS26Legacy enable]` returns `YES`.
+以下所有逻辑仅在 `+[iOS26Legacy enable]` 返回 `YES` 时生效。
 
 ### UIScrollView
 
-- Behavior: disables the new scroll-edge visual effect introduced by iOS 26.
-- Mechanism:
-  - hooks `[UIScrollEdgeEffect isHidden]` to return `YES`.
+- 实现：关闭 iOS 26 新增的滚动边缘视觉效果
+- 原理：
+    - hook `[UIScrollEdgeEffect isHidden]` 为YES
 
 ### UINavigationBar
 
-- Behavior: disables the new button background visual effect introduced by iOS 26.
-- Mechanism:
-  - hooks `[UIBarButtonItem hidesSharedBackground]` to return `YES`.
-  - hooks `[UIBarButtonItem sharesBackground]` to return `NO`.
+- 实现：关闭 iOS 26 新增的按钮背景视觉效果
+- 原理：
+    - hook `[UIBarButtonItem hidesSharedBackground]` 为YES
+    - hook `[UIBarButtonItem sharesBackground]` 为NO
 
 ### UITabBar
 
-- Behavior: disables the new liquid-glass interaction introduced by iOS 26.
-- Mechanism:
-  - hooks `[UITabBar addSubview:]` and hides system-added `_UITabBarPlatterView`.
-  - hooks `[UITabBar addGestureRecognizer:]` and disables system-added `_UIContinuousSelectionGestureRecognizer`.
+- 实现：关闭 iOS 26 新增的液态玻璃交互
+- 原理：
+    - hook `[UITabBar addSubview:]` ，将系统添加的 `_UITabBarPlatterView` 设为隐藏
+    - hook `[UITabBar addGestureRecognizer:]` ，将系统添加的 `_UIContinuousSelectionGestureRecognizer` 设为disable
 
-- Behavior: restores older transition behavior around `hidesBottomBarWhenPushed`.
-- Mechanism:
-  - hooks `[UIViewController hidesBottomBarWhenPushed]` to return `NO`.
-  - hooks `[UIViewController setHidesBottomBarWhenPushed:]` to store external values and exposes `[UIViewController customHidesBottomBarWhenPushed]`.
-  - inserts custom tab bar transition in `UINavigationControllerDelegate` `willShowViewController:`.
-    - hooks `[UINavigationController setDelegate:]`.
-    - hooks `[UINavigationController viewDidLoad]`.
+- 实现：还原低版本hidesBottomBarWhenPushed系统动画行为
+- 原理：
+    - hook `[UITabBar hidesBottomBarWhenPushed]`，返回NO
+    - hook `[UITabBar setHidesBottomBarWhenPushed:]`，记录设置并通过添加 `[UITabBar customHidesBottomBarWhenPushed]`返回
+    - 在 `UINavigationControllerDelegate` 的 `willShowViewController:` 时，插入自定义tabbar转场。将tabbar截图后贴在fromVC或toVC实现。
+        - hook `[UINavigationController setDelegate:]`
+        - hook `[UINavigationController viewDidLoad]`
 
-## Pod Structure
+## Pod 结构
 
-- `base`: main switch
-- `UIScrollView`: UIScrollView compatibility
-- `UINavigationBar`: UINavigationBar compatibility
-- `UITabBar`: UITabBar compatibility
+- `base`：总开关
+- `UIScrollView`：UIScrollView兼容
+- `UINavigationBar`：UINavigationBar兼容
+- `UITabBar`：UITabBar兼容
 
-Default install includes all subspecs.
+默认安装包含全部 subspec。
 
-## Installation
+## 安装方式
 
-Add this to your Podfile:
+在 Podfile 中添加：
 
 ```ruby
 pod 'iOS26Legacy'
 ```
 
-Or choose subspecs:
+或指定 subspec：
 
 ```ruby
 pod 'iOS26Legacy', :subspecs => ['UITabBar']
@@ -70,4 +68,4 @@ liuzhe1117
 
 ## License
 
-iOS26Legacy is available under the MIT license. See the LICENSE file for more info.
+iOS26Legacy 基于 MIT 协议发布，详见 `LICENSE` 文件。
